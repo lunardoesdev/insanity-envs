@@ -27,6 +27,7 @@
           overlays = [ rustOverlay ];
           config.allowUnfree = true;
           config.android_sdk.accept_license = true;
+          config.allowUnsupportedSystem = true;
         };
     in
     {
@@ -41,6 +42,9 @@
             ndkver = "26.1.10909125";
             platformver = "34.0.0";
             builttoolsver = "34";
+          };
+          windows = pkgs.callPackage ./envs/mingw-w64 {
+              inherit inputs;
           };
         }
       );
