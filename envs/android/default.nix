@@ -92,14 +92,5 @@ pkgs.mkShell {
     export JAVA_HOME="${pkgs.jdk17}/lib/openjdk"
 
     echo "Android development shell active"
-    echo "  ANDROID_HOME = $ANDROID_HOME"
-    echo "  ANDROID_NDK_HOME = $ANDROID_NDK_HOME"
-    echo "  Target = $TARGET (API $API_LEVEL)"
-    echo "  CC = $CC"
-    echo "  Cargo linker = CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER $CC"
-    echo "  Gradle: $(gradle --version | head -n1)"
-    echo "  Bazel: $(bazel --version)"
-    echo "  CMake: $(cmake --version | head -n1)"
-    echo "  Rust: $(rustc --version)"
   '';
 }
