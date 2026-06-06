@@ -49,6 +49,7 @@ pkgs.mkShell {
     ninja
     pkg-config
     git
+    jdk17
   ];
 
   shellHook = ''
