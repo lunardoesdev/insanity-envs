@@ -9,7 +9,15 @@ let
     ndkVersions = [ "26.1.10909125" ]; # NDK r26
   };
   sdk = android.androidsdk;
-  ndk = android.ndk;
+
+  # Determine NDK prebuilt directory name based on host platform
+  hostPrebuilt =
+    if pkgs.stdenv.hostPlatform.isLinux then
+      if pkgs.stdenv.hostPlatform.isAarch64 then "linux-aarch64" else "linux-x86_64"
+    else if pkgs.stdenv.hostPlatform.isDarwin then
+      if pkgs.stdenv.hostPlatform.isAarch64 then "darwin-aarch64" else "darwin-x86_64"
+    else
+      throw "Unsupported host platform: ${pkgs.stdenv.hostPlatform.system}";
 
   # Rust with Android target support
   rust-bin = pkgs.rust-bin.stable.latest.default.override {
@@ -22,9 +30,9 @@ let
   };
 
   # NDK toolchain paths
-  ndkRoot = "${ndk}/libexec/android-sdk/ndk-bundle";
-  llvmPath = "${ndkRoot}/toolchains/llvm/prebuilt/linux-x86_64/bin";
-  clangPrefix = "${ndkRoot}/toolchains/llvm/prebuilt/linux-x86_64/bin";
+  ndkRoot = "${sdk}/libexec/android-sdk/ndk-bundle";
+  llvmPath = "${ndkRoot}/toolchains/llvm/prebuilt/${hostPrebuilt}/bin";
+  clangPrefix = "${ndkRoot}/toolchains/llvm/prebuilt/${hostPrebuilt}/bin";
   target = "aarch64-linux-android"; # default, can be changed
   apiLevel = "33";
 in
@@ -32,7 +40,6 @@ pkgs.mkShell {
   name = "android-devshell";
   buildInputs = with pkgs; [
     sdk
-    ndk
     gradle
     bazel
     cmake
@@ -81,12 +88,12 @@ pkgs.mkShell {
     export PKG_CONFIG_SYSROOT_DIR="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
     export PKG_CONFIG_LIBDIR=""
 
-    echo "✓ Android development shell active"
+    echo "Android development shell active"
     echo "  ANDROID_HOME = $ANDROID_HOME"
     echo "  ANDROID_NDK_HOME = $ANDROID_NDK_HOME"
     echo "  Target = $TARGET (API $API_LEVEL)"
     echo "  CC = $CC"
-    echo "  Cargo linker = CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER → $CC"
+    echo "  Cargo linker = CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER $CC"
     echo "  Gradle: $(gradle --version | head -n1)"
     echo "  Bazel: $(bazel --version)"
     echo "  CMake: $(cmake --version | head -n1)"
