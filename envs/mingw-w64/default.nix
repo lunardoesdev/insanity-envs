@@ -30,7 +30,32 @@ let
         --add-flags "-DCMAKE_SYSTEM_NAME=Windows"
     '';
   };
+  
+  meson-mingw-crossfile = pkgsCross.writeText "cross.txt" ''
+[binaries]
+c = 'x86_64-w64-mingw32-gcc'
+cpp = 'x86_64-w64-mingw32-g++'
+ar = 'x86_64-w64-mingw32-ar'
+windres = 'x86_64-w64-mingw32-windres'
+strip = 'x86_64-w64-mingw32-strip'
 
+[host_machine]
+system = 'windows'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+  '';
+  
+  meson-mingw = stdenv.mkDerivation {
+    name = "cmake-wrapper";
+    nativeBuildInputs = [ makeWrapper ];
+    buildCommand = ''
+      mkdir -p $out/bin
+      makeWrapper ${pkgs.meson}/bin/meson $out/bin/meson \
+        --add-flags "--cross-file=${meson-mingw-crossfile}"
+    '';
+  };
+  
   dummy = pkgsCross.stdenv.mkDerivation {
     name = "cross-setup";
     src = pkgsCross.writeText "dummy.c" "int main() { return 0; }";
@@ -80,11 +105,12 @@ pkgsCross.callPackage (
       autoconf
       automake
       libtool
-      cmake
+      cmake-mingw
       pkg-config
       zstd
       git
       xmake
+      meson-mingw
       file
     ];
 
