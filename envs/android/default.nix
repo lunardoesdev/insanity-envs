@@ -1,18 +1,18 @@
 {
   pkgs,
-  ndkver ? "26.1.10909125",
-  platformver ? "34.0.0",
-  builttoolsver ? "34",
+  ndkvers ? ["26.1.10909125"],
+  platformvers ? ["34"],
+  buildtoolsvers ? ["34.0.0"],
   ...
 }:
 let
   # Use androidenv to get SDK and NDK
   android = pkgs.androidenv.composeAndroidPackages {
-    platformVersions = [ buildtoolsver ];
-    buildToolsVersions = [ platformver ];
+    platformVersions = platformvers;
+    buildToolsVersions = buildtoolsvers;
     includeEmulator = false;
     includeNDK = true;
-    ndkVersions = [ ndkver ];
+    ndkVersions = ndkvers;
   };
   sdk = android.androidsdk;
 

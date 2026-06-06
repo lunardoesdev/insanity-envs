@@ -39,9 +39,9 @@
         {
           debian = pkgs.callPackage ./envs/debiansdk { };
           android = pkgs.callPackage ./envs/android {
-            ndkver = "26.1.10909125";
-            platformver = "34.0.0";
-            builttoolsver = "34";
+            ndkvers = ["26.1.10909125"];
+            platformvers = ["37" "34" "24"];
+            builttoolsvers = ["37.0.0" "34.0.0" "24.0.0"];
           };
           windows = pkgs.callPackage ./envs/mingw-w64 {
             inherit inputs;
