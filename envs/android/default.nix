@@ -53,7 +53,7 @@ pkgs.mkShell {
 
   shellHook = ''
     # Android SDK & NDK paths
-    export ANDROID_HOME="${sdk}/share/android-sdk"
+    export ANDROID_HOME="${sdk}/libexec/android-sdk"
     export ANDROID_SDK_ROOT="$ANDROID_HOME"
     export ANDROID_NDK_HOME="${ndkRoot}"
     export ANDROID_NDK_ROOT="$ANDROID_NDK_HOME"
