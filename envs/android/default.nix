@@ -2,8 +2,8 @@
 let
   # Use androidenv to get SDK and NDK
   android = pkgs.androidenv.composeAndroidPackages {
-    platformVersions = [ "33" ]; # API 33
-    buildToolsVersions = [ "33.0.1" ];
+    platformVersions = [ "34" ];
+    buildToolsVersions = [ "34.0.0" ];
     includeEmulator = false;
     includeNDK = true;
     ndkVersions = [ "26.1.10909125" ]; # NDK r26
