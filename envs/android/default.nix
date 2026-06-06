@@ -88,6 +88,8 @@ pkgs.mkShell {
     # Optional: silence pkg-config (avoid host includes)
     export PKG_CONFIG_SYSROOT_DIR="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
     export PKG_CONFIG_LIBDIR=""
+    
+    export JAVA_HOME="${pkgs.jdk17}/lib/openjdk"
 
     echo "Android development shell active"
     echo "  ANDROID_HOME = $ANDROID_HOME"
