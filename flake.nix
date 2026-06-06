@@ -31,7 +31,7 @@
           };
         in
         {
-          default = pkgs.callPackage ./envs/litoli { };
+          debian = pkgs.callPackage ./envs/debiansdk { };
         }
       );
 
