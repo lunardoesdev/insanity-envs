@@ -2,7 +2,7 @@
   description = "Litoli CMake/Nix cross-compilation example";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
@@ -44,7 +44,7 @@
             builttoolsver = "34";
           };
           windows = pkgs.callPackage ./envs/mingw-w64 {
-              inherit inputs;
+            inherit inputs;
           };
         }
       );

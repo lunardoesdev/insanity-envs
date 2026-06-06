@@ -1,58 +1,95 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  stdenv,
+  makeWrapper,
+  ...
+}:
 let
-    pkgsWin = pkgs.callPackage ./pkgsWin.nix { inherit inputs; };
+  pkgsCross = import inputs.nixpkgs {
+    config.allowUnfree = true;
+    config.android_sdk.accept_license = true;
+    config.allowUnsupportedSystem = true;
+    localSystem = stdenv.hostPlatform.system;
+    crossSystem = {
+      config = "x86_64-w64-mingw32";
+    };
+    overlays = [ (import inputs.rust-overlay) ];
+  };
+  rust-toolchain = pkgsCross.pkgsBuildHost.rust-bin.stable.latest.default.override {
+    targets = [ "x86_64-pc-windows-gnu" ];
+  };
+
+  cmake-mingw = stdenv.mkDerivation {
+    name = "cmake-wrapper";
+    nativeBuildInputs = [ makeWrapper ];
+    buildCommand = ''
+      mkdir -p $out/bin
+      makeWrapper ${pkgs.cmake}/bin/cmake $out/bin/cmake \
+        --add-flags "-DCMAKE_BUILD_TYPE=Release" \
+        --add-flags "-DCMAKE_SYSTEM_NAME=Windows"
+    '';
+  };
+
+  dummy = pkgsCross.stdenv.mkDerivation {
+    name = "cross-setup";
+    src = pkgsCross.writeText "dummy.c" "int main() { return 0; }";
+    phases = [ "configurePhase" ];
+    nativeBuildInputs = with pkgsCross; [
+      cmake
+      meson
+      ninja
+      pkg-config
+    ];
+    configurePhase = ''
+      echo "Running configurePhase — hooks are now active"
+    '';
+    installPhase = "mkdir -p $out";
+  };
+
 in
-pkgsWin.mkShell {
-  buildInputs = with pkgsWin; [
-    cmake
-    clang
-    llvm
-    binutils
-    gnumake
-    ninja
-    autoconf
-    automake
-    libtool
-    meson
-    pkg-config
-    zstd
-    git
-    xmake
-    # Optional: Rust with MinGW target support
-    (rust-bin.stable.latest.default.override {
-      targets = [ "x86_64-pc-windows-gnullvm" ];
-    })
-  ];
+pkgsCross.callPackage (
+  {
+    cmake,
+    gnumake,
+    ninja,
+    autoconf,
+    automake,
+    libtool,
+    meson,
+    pkg-config,
+    zstd,
+    git,
+    xmake,
+    mkShell,
+    windows,
+    file,
+    buildPackages,
+    stdenv,
+  }:
+  mkShell {
+    buildInputs = [
+      pkgsCross.windows.pthreads
+    ];
 
-  shellHook = ''
-    export TARGET="x86_64-pc-windows-gnullvm"
+    inputsFrom = [ dummy ];
 
-    # Compilers and assembler
-    export CC="${pkgsWin.clang}/bin/clang"
-    export CXX="${pkgsWin.clang}/bin/clang++"
-    export AS="$CC"
-    export ASFLAGS="--target=$TARGET"
+    nativeBuildInputs = [
+      gnumake
+      ninja
+      autoconf
+      automake
+      libtool
+      cmake
+      pkg-config
+      zstd
+      git
+      xmake
+      file
+    ];
 
-    # Linker (use Clang as driver + lld internally)
-    export LD="$CC"
-    export LD_FOR_TARGET="$LD"
-
-    # LLVM binutils tools
-    export AR="${pkgsWin.binutils}/bin/llvm-ar"
-    export RANLIB="${pkgsWin.binutils}/bin/llvm-ranlib"
-    export NM="${pkgsWin.binutils}/bin/llvm-nm"
-    export STRIP="${pkgsWin.binutils}/bin/llvm-strip"
-
-    # CMake hints
-    export CMAKE_LIBRARY_PATH="$LIBDIRS"
-    export CMAKE_INCLUDE_PATH="$INCLUDEDIRS"
-    
-export CMAKE_C_COMPILER_TARGET=x86_64-pc-windows-gnu
-export CMAKE_CXX_COMPILER_TARGET=x86_64-pc-windows-gnu
-export CMAKE_C_COMPILER_WORKS=ON 
-export CMAKE_CXX_COMPILER_WORKS=ON 
-export CMAKE_SYSROOT="$MINGW_SDK"
-
-    
-  '';
-}
+    shellHook = ''
+      export CPM_SOURCE_CACHE="$HOME/.cache/CPM"
+    '';
+  }
+) { }
