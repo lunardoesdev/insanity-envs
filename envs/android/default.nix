@@ -1,8 +1,8 @@
 {
   pkgs,
-  ndkvers ? ["26.1.10909125"],
-  platformvers ? ["34"],
-  buildtoolsvers ? ["34.0.0"],
+  ndkvers ? [ "26.1.10909125" ],
+  platformvers ? [ "34" ],
+  buildtoolsvers ? [ "34.0.0" ],
   ...
 }:
 let
