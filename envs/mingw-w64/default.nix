@@ -56,66 +56,28 @@ let
     '';
   };
 
-  dummy = pkgsCross.stdenv.mkDerivation {
-    name = "cross-setup";
-    src = pkgsCross.writeText "dummy.c" "int main() { return 0; }";
-    phases = [ "configurePhase" ];
-    nativeBuildInputs = with pkgsCross; [
-      cmake
-      meson
-      ninja
-      pkg-config
-    ];
-    configurePhase = ''
-      echo "Running configurePhase — hooks are now active"
-    '';
-    installPhase = "mkdir -p $out";
-  };
-
 in
-pkgsCross.callPackage (
-  {
-    cmake,
-    gnumake,
-    ninja,
-    autoconf,
-    automake,
-    libtool,
-    meson,
-    pkg-config,
-    zstd,
-    git,
-    xmake,
-    mkShell,
-    windows,
-    file,
-    buildPackages,
-    stdenv,
-  }:
-  mkShell {
-    buildInputs = [
-      pkgsCross.windows.pthreads
-    ];
+pkgsCross.mkShell {
+  buildInputs = [
+    pkgsCross.windows.pthreads
+  ];
 
-    inputsFrom = [ dummy ];
+  nativeBuildInputs = with pkgsCross; [
+    gnumake
+    ninja
+    autoconf
+    automake
+    libtool
+    cmake-mingw
+    pkg-config
+    zstd
+    git
+    xmake
+    meson-mingw
+    file
+  ];
 
-    nativeBuildInputs = [
-      gnumake
-      ninja
-      autoconf
-      automake
-      libtool
-      cmake-mingw
-      pkg-config
-      zstd
-      git
-      xmake
-      meson-mingw
-      file
-    ];
-
-    shellHook = ''
-      export CPM_SOURCE_CACHE="$HOME/.cache/CPM"
-    '';
-  }
-) { }
+  shellHook = ''
+    export CPM_SOURCE_CACHE="$HOME/.cache/CPM"
+  '';
+}
