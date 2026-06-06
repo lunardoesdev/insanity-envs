@@ -12,7 +12,7 @@
       nixpkgs,
       rust-overlay,
       ...
-    }:
+    }@inputs:
     let
       systems = [
         "x86_64-linux"
@@ -37,7 +37,11 @@
         in
         {
           debian = pkgs.callPackage ./envs/debiansdk { };
-          android = pkgs.callPackage ./envs/android { };
+          android = pkgs.callPackage ./envs/android {
+            ndkver = "26.1.10909125";
+            platformver = "34.0.0";
+            builttoolsver = "34";
+          };
         }
       );
 

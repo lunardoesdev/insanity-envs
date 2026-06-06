@@ -1,12 +1,18 @@
-{ pkgs }:
+{
+  pkgs,
+  ndkver ? "26.1.10909125",
+  platformver ? "34.0.0",
+  builttoolsver ? "34",
+  ...
+}:
 let
   # Use androidenv to get SDK and NDK
   android = pkgs.androidenv.composeAndroidPackages {
-    platformVersions = [ "34" ];
-    buildToolsVersions = [ "34.0.0" ];
+    platformVersions = [ buildtoolsver ];
+    buildToolsVersions = [ platformver ];
     includeEmulator = false;
     includeNDK = true;
-    ndkVersions = [ "26.1.10909125" ]; # NDK r26
+    ndkVersions = [ ndkver ];
   };
   sdk = android.androidsdk;
 
@@ -88,7 +94,7 @@ pkgs.mkShell {
     # Optional: silence pkg-config (avoid host includes)
     export PKG_CONFIG_SYSROOT_DIR="$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
     export PKG_CONFIG_LIBDIR=""
-    
+
     export JAVA_HOME="${pkgs.jdk17}/lib/openjdk"
 
     echo "Android development shell active"
