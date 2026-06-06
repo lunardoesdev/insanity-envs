@@ -20,18 +20,23 @@
       ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
       rustOverlay = (import rust-overlay);
+      pkgsForSystem =
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays = [ rustOverlay ];
+          config.allowUnfree = true;
+        };
     in
     {
       devShells = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ rustOverlay ];
-          };
+          pkgs = pkgsForSystem system;
         in
         {
           debian = pkgs.callPackage ./envs/debiansdk { };
+          android = pkgs.callPackage ./envs/android { };
         }
       );
 
