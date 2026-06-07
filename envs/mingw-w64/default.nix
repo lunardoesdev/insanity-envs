@@ -75,6 +75,8 @@ pkgsCross.mkShell {
     xmake
     meson-mingw
     file
+    bazelisk
+    rust-toolchain
   ];
 
   shellHook = ''

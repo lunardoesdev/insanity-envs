@@ -25,6 +25,7 @@ pkgs.mkShell {
     git
     xmake
     rust
+    bazelisk
   ];
   shellHook = ''
     export LITOLI_SDK="$LITOLI_SDK"

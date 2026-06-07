@@ -47,7 +47,7 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     sdk
     gradle
-    bazel
+    bazelisk
     cmake
     rust-bin
     # additional build tools
